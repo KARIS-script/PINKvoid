@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers - Polos
+-- Saiki Kusuo Powers - Revisi Deluxe Gambar
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -21,18 +21,24 @@ ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Tombol buka UI (teks doang)
+-- Tombol Deluxe (gambar)
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
-ToggleBtn.Text = "S"
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleBtn.TextScaled = true
-ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.Text = "$@¡k!"
+ToggleBtn.TextTransparency = 1
 ToggleBtn.Parent = ScreenGui
 local TBC = Instance.new("UICorner", ToggleBtn)
 TBC.CornerRadius = UDim.new(0, 30)
+
+local ToggleImg = Instance.new("ImageLabel")
+ToggleImg.Size = UDim2.new(1, 0, 1, 0)
+ToggleImg.BackgroundTransparency = 1
+ToggleImg.Image = "rbxassetid://5224936802"
+ToggleImg.ScaleType = Enum.ScaleType.Stretch
+ToggleImg.ZIndex = 2
+ToggleImg.Parent = ToggleBtn
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
@@ -155,7 +161,7 @@ local function startAutoRegen()
     end)
 end
 
--- Flight (analog)
+-- Flight
 local flying = false
 local bodyVel = nil
 local bodyGyro = nil
@@ -416,7 +422,6 @@ CloseBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
 end)
 
--- Notifikasi
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "Saiki Powers";
     Text = "Script loaded!";
