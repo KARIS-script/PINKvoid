@@ -5,8 +5,8 @@ local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 -- ===== KONFIGURASI =====
-local IMAGE_URL = https://imgur.com/a/isADRGw -- 
-local WA_LINK = https://whatsapp.com/channel/0029VbD8SsK4SpkJ9HjqBo1x
+local IMAGE_URL = "https://imgur.com/a/isADRGw.png" -- 
+local WA_LINK = "https://whatsapp.com/channel/0029VbD8SsK4SpkJ9HjqBo1x"
 
 -- ===== VARIABEL SETTINGS =====
 local Settings = {
