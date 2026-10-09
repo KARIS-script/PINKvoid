@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers - Full Version + Auto Regen + Tombol Gambar + Flight 2x Jump
+-- Saiki Kusuo Powers - Update Besar
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -11,6 +11,7 @@ local WA_LINK = "https://whatsapp.com/channel/0029VbD8SsK4SpkJ9HjqBo1x"
 local Settings = {
     TelekinesisPower = 200,
     FlightSpeed = 100,
+    FlightSmoothness = 0.2,
     InvisibilityOpacity = 100,
     TimeStopRange = 500,
     PyrokinesisSize = 10,
@@ -18,34 +19,46 @@ local Settings = {
     AutoRegen = false,
     RegenAmount = 9,
     FlightEnabled = false,
+    UISize = 1.0,
 }
 
 -- ===== GUI UTAMA =====
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
-ScreenGui.ResetOnSpawn = false -- Biar gak kehapus saat respawn
+ScreenGui.ResetOnSpawn = false
 
--- ===== TOMBOL BUKA UI (GAMBAR KOTAK) =====
+-- ===== TOMBOL BUKA UI (GAMBAR) =====
 local ToggleBtn = Instance.new("ImageButton")
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
 ToggleBtn.Image = IMAGE_URL
-ToggleBtn.ScaleType = Enum.ScaleType.Crop
+ToggleBtn.ScaleType = Enum.ScaleType.Stretch -- Menyesuaikan gambar
 ToggleBtn.Parent = ScreenGui
-local TBC = Instance.new("UICorner", ToggleBtn)
-TBC.CornerRadius = UDim.new(0, 8)
 
+-- ===== MAIN FRAME =====
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 450, 0, 320)
-MainFrame.Position = UDim2.new(0.5, -225, 0.5, -160)
+MainFrame.Size = UDim2.new(0, 450, 0, 350)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -175)
 MainFrame.BackgroundColor3 = Color3.fromRGB(30, 10, 25)
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
 local MC = Instance.new("UICorner", MainFrame)
 MC.CornerRadius = UDim.new(0, 12)
+
+-- Corak batik Mega Mendung (gradient awan)
+local BatikMegaMendung = Instance.new("ImageLabel")
+BatikMegaMendung.Size = UDim2.new(1, 0, 1, 0)
+BatikMegaMendung.BackgroundTransparency = 1
+BatikMegaMendung.Image = "rbxassetid://1316045217" -- Corak awan
+BatikMegaMendung.ImageTransparency = 0.8
+BatikMegaMendung.ScaleType = Enum.ScaleType.Tile
+BatikMegaMendung.TileSize = UDim2.new(0, 100, 0, 100)
+BatikMegaMendung.Parent = MainFrame
+local BMC = Instance.new("UICorner", BatikMegaMendung)
+BMC.CornerRadius = UDim.new(0, 12)
 
 local Gradient = Instance.new("UIGradient")
 Gradient.Color = ColorSequence.new{
@@ -56,9 +69,11 @@ Gradient.Color = ColorSequence.new{
 Gradient.Rotation = 45
 Gradient.Parent = MainFrame
 
+-- ===== SIDEBAR =====
 local Sidebar = Instance.new("Frame")
 Sidebar.Size = UDim2.new(0, 100, 1, 0)
 Sidebar.BackgroundColor3 = Color3.fromRGB(50, 15, 40)
+Sidebar.BackgroundTransparency = 0.3
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = MainFrame
 local SC = Instance.new("UICorner", Sidebar)
@@ -111,22 +126,35 @@ ScrollingFrame.ScrollBarThickness = 4
 ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
 ScrollingFrame.Parent = ContentFrame
 
-local Footer = Instance.new("TextLabel")
-Footer.Size = UDim2.new(1, -110, 0, 25)
-Footer.Position = UDim2.new(0, 105, 1, -25)
-Footer.BackgroundTransparency = 1
-Footer.Text = "WA: " .. WA_LINK
-Footer.TextColor3 = Color3.fromRGB(255, 182, 193)
-Footer.TextScaled = true
-Footer.Font = Enum.Font.Gotham
-Footer.TextXAlignment = Enum.TextXAlignment.Left
-Footer.Parent = MainFrame
+-- Batik Parang untuk Powers
+local BatikParang = Instance.new("ImageLabel")
+BatikParang.Size = UDim2.new(1, 0, 1, 0)
+BatikParang.BackgroundTransparency = 1
+BatikParang.Image = "rbxassetid://1316045217"
+BatikParang.ImageTransparency = 0.85
+BatikParang.ScaleType = Enum.ScaleType.Tile
+BatikParang.TileSize = UDim2.new(0, 80, 0, 80)
+BatikParang.Parent = ScrollingFrame
+
+-- Batik Truntum untuk Pengaturan
+local BatikTruntum = Instance.new("ImageLabel")
+BatikTruntum.Size = UDim2.new(1, 0, 1, 0)
+BatikTruntum.BackgroundTransparency = 1
+BatikTruntum.Image = "rbxassetid://1316045217"
+BatikTruntum.ImageTransparency = 0.85
+BatikTruntum.ScaleType = Enum.ScaleType.Tile
+BatikTruntum.TileSize = UDim2.new(0, 60, 0, 60)
+BatikTruntum.Parent = MainFrame
 
 -- ===== FUNGSI =====
 local allFeatures = {}
 
 local function clearContent()
-    for _, v in pairs(ScrollingFrame:GetChildren()) do v:Destroy() end
+    for _, v in pairs(ScrollingFrame:GetChildren()) do
+        if v:IsA("TextButton") or v:IsA("Frame") or v:IsA("TextLabel") then
+            v:Destroy()
+        end
+    end
     allFeatures = {}
 end
 
@@ -236,15 +264,17 @@ local function startAutoRegen()
                 end
             end
         end
+        lastHealth = humanoid.Health
     end)
 end
 
--- ===== FLIGHT SYSTEM (2X JUMP + WASD) =====
+-- ===== FLIGHT SYSTEM (ANALOG + SMOOTH) =====
 local flying = false
 local bodyVel = nil
 local bodyGyro = nil
 local jumpCount = 0
 local lastJumpTime = 0
+local currentVelocity = Vector3.new(0, 0, 0)
 
 local function startFlight()
     local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -267,8 +297,7 @@ local function stopFlight()
     if bodyGyro then bodyGyro:Destroy() bodyGyro = nil end
 end
 
--- Update flight movement
-RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function(dt)
     if flying and bodyVel and bodyGyro then
         local moveDir = Vector3.new(0, 0, 0)
         local cam = workspace.CurrentCamera
@@ -290,16 +319,18 @@ RunService.RenderStepped:Connect(function()
         if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
             moveDir = moveDir - Vector3.new(0, 1, 0)
         end
+        
+        -- Smooth velocity
+        local targetVel = Vector3.new(0, 0, 0)
         if moveDir.Magnitude > 0 then
-            bodyVel.Velocity = moveDir.Unit * Settings.FlightSpeed
-        else
-            bodyVel.Velocity = Vector3.new(0, 0, 0)
+            targetVel = moveDir.Unit * Settings.FlightSpeed
         end
+        currentVelocity = currentVelocity:Lerp(targetVel, Settings.FlightSmoothness)
+        bodyVel.Velocity = currentVelocity
         bodyGyro.CFrame = cam.CFrame
     end
 end)
 
--- Deteksi lompat 2x
 UIS.JumpRequest:Connect(function()
     if not Settings.FlightEnabled then return end
     local now = tick()
@@ -319,7 +350,53 @@ UIS.JumpRequest:Connect(function()
     end
 end)
 
--- ===== TAB POWERS =====
+-- ===== SUPER STRENGTH (ANIMASI + PENTAL) =====
+local function activateSuperStrength()
+    local char = player.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local humanoid = char:FindFirstChild("Humanoid")
+    if not hrp or not humanoid then return end
+    
+    -- Animasi menonjok
+    local anim = Instance.new("Animation")
+    anim.AnimationId = "rbxassetid://12521411117" -- Animasi punch
+    local animTrack = humanoid:LoadAnimation(anim)
+    animTrack:Play()
+    
+    -- Efek visual
+    local punchEffect = Instance.new("Part")
+    punchEffect.Size = Vector3.new(3, 3, 3)
+    punchEffect.Shape = Enum.PartType.Ball
+    punchEffect.Material = Enum.Material.Neon
+    punchEffect.Color = Color3.fromRGB(255, 105, 180)
+    punchEffect.Anchored = true
+    punchEffect.CanCollide = false
+    punchEffect.CFrame = hrp.CFrame * CFrame.new(0, 0, -3)
+    punchEffect.Parent = workspace
+    game:GetService("Debris"):AddItem(punchEffect, 0.3)
+    
+    -- Cek target di depan
+    local ray = Ray.new(hrp.Position, hrp.CFrame.LookVector * 10)
+    local targetPart = workspace:FindPartOnRay(ray, char)
+    
+    if targetPart and targetPart.Parent then
+        local targetHumanoid = targetPart.Parent:FindFirstChild("Humanoid")
+        local targetHrp = targetPart.Parent:FindFirstChild("HumanoidRootPart")
+        if targetHumanoid and targetHrp then
+            -- Terbang jauh
+            local bv = Instance.new("BodyVelocity", targetHrp)
+            bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            bv.Velocity = hrp.CFrame.LookVector * 500 + Vector3.new(0, 200, 0)
+            game:GetService("Debris"):AddItem(bv, 0.5)
+            
+            -- Damage
+            targetHumanoid.Health = 0
+        end
+    end
+end
+
+-- ===== TAB POWERS (termasuk Flight & Elemen) =====
 local function openPowers()
     clearContent()
     createToggle("TELEKINESIS", 5, false, function(v)
@@ -384,31 +461,26 @@ local function openPowers()
             end
         end
     end)
-    createToggle("SUPER STRENGTH", 215, false, function(v)
+    createToggle("BOUNDLESS (Super Strength)", 215, false, function(v)
         if v then
             local char = player.Character
             if char then
                 local tool = Instance.new("Tool")
-                tool.Name = "SaikiPunch"
+                tool.Name = "Boundless"
                 tool.RequiresHandle = false
                 tool.Parent = player.Backpack
                 tool.Activated:Connect(function()
-                    if mouse.Target and mouse.Target.Parent then
-                        local h = mouse.Target.Parent:FindFirstChild("Humanoid")
-                        if h then h.Health = 0 end
-                        mouse.Target:BreakJoints()
-                    end
+                    activateSuperStrength()
                 end)
             end
         end
     end)
-end
-
--- ===== TAB ELEMEN =====
-local function openElements()
-    clearContent()
-    local activeElement = nil
-    
+    -- Flight toggle di Powers
+    createToggle("FLIGHT (2x JUMP)", 250, false, function(v)
+        Settings.FlightEnabled = v
+        if not v and flying then stopFlight() end
+    end)
+    -- Elemen di Powers
     local elements = {
         {name = "API", color = Color3.fromRGB(255, 69, 0)},
         {name = "AIR", color = Color3.fromRGB(0, 150, 255)},
@@ -417,13 +489,11 @@ local function openElements()
         {name = "LISTRIK", color = Color3.fromRGB(255, 255, 0)},
         {name = "BESI", color = Color3.fromRGB(150, 150, 150)},
     }
-    
+    local activeElement = nil
     for i, el in ipairs(elements) do
-        createToggle(el.name, (i-1) * 35 + 5, false, function(v)
+        createToggle(el.name, 285 + (i-1) * 35, false, function(v)
             if v then
-                if activeElement then
-                    activeElement:Destroy()
-                end
+                if activeElement then activeElement:Destroy() end
                 local char = player.Character
                 if char then
                     local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -442,23 +512,22 @@ local function openElements()
                     end
                 end
             else
-                if activeElement then
-                    activeElement:Destroy()
-                    activeElement = nil
-                end
+                if activeElement then activeElement:Destroy() activeElement = nil end
             end
         end)
     end
-    
-    createSlider("Kekuatan Elemen", 220, 10, 100, Settings.ElementPower, function(v)
-        Settings.ElementPower = v
-    end)
 end
 
--- ===== TAB SETTINGS =====
+-- ===== TAB PENGATURAN (termasuk speed flight & auto regen) =====
 local function openSettings()
     clearContent()
-    createToggle("INVISIBLE", 5, false, function(v)
+    createSlider("Kecepatan Terbang", 5, 10, 500, Settings.FlightSpeed, function(v)
+        Settings.FlightSpeed = v
+    end)
+    createSlider("Kehalusan Terbang", 40, 0.05, 1, Settings.FlightSmoothness, function(v)
+        Settings.FlightSmoothness = v
+    end)
+    createToggle("INVISIBLE", 90, false, function(v)
         local char = player.Character
         if char then
             for _, part in pairs(char:GetDescendants()) do
@@ -466,94 +535,4 @@ local function openSettings()
                     part.LocalTransparencyModifier = v and (1 - (Settings.InvisibilityOpacity / 100)) or 0
                 end
             end
-        end
-    end)
-    createSlider("Opasitas Invisible (%)", 40, 0, 100, Settings.InvisibilityOpacity, function(v)
-        Settings.InvisibilityOpacity = v
-    end)
-    createToggle("AUTO REGEN", 100, false, function(v)
-        Settings.AutoRegen = v
-        if v then
-            startAutoRegen()
-        else
-            if regenConnection then
-                regenConnection:Disconnect()
-                regenConnection = nil
-            end
-        end
-    end)
-    createSlider("Jumlah Regen (HP)", 140, 1, 50, Settings.RegenAmount, function(v)
-        Settings.RegenAmount = v
-    end)
-end
-
--- ===== TAB FLIGHT =====
-local function openFlight()
-    clearContent()
-    createToggle("FLIGHT (2x JUMP)", 5, false, function(v)
-        Settings.FlightEnabled = v
-        if not v and flying then
-            stopFlight()
-        end
-    end)
-    createSlider("Kecepatan Terbang", 40, 10, 500, Settings.FlightSpeed, function(v)
-        Settings.FlightSpeed = v
-    end)
-end
-
-local function createSideButton(name, yPos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -10, 0, 35)
-    btn.Position = UDim2.new(0, 5, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(80, 20, 60)
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextScaled = true
-    btn.Font = Enum.Font.Gotham
-    btn.Parent = Sidebar
-    local c = Instance.new("UICorner", btn)
-    c.CornerRadius = UDim.new(0, 8)
-    btn.MouseButton1Click:Connect(callback)
-end
-
-createSideButton("Powers", 50, openPowers)
-createSideButton("Elemen", 90, openElements)
-createSideButton("Settings", 130, openSettings)
-createSideButton("Flight", 170, openFlight)
-
-openPowers()
-
-SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-    local query = string.lower(SearchBox.Text)
-    for _, f in ipairs(allFeatures) do
-        if query == "" then
-            f.button.Visible = true
-            if f.label then f.label.Visible = true end
-        else
-            local visible = string.find(string.lower(f.name), query) ~= nil
-            f.button.Visible = visible
-            if f.label then f.label.Visible = visible end
-        end
-    end
-end)
-
--- ===== TOGGLE UI (TOMBOL TETAP ADA) =====
-ToggleBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
-end)
-
--- ===== TOMBOL CLOSE (HANYA SEMBUNYIKAN UI) =====
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Position = UDim2.new(1, -30, 0, 5)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextScaled = true
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.Parent = MainFrame
-local CC = Instance.new("UICorner", CloseBtn)
-CC.CornerRadius = UDim.new(0, 12)
-CloseBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false -- Cuma sembunyikan, tombol tetap ada
-end)
+       
