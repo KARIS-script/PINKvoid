@@ -1,11 +1,11 @@
--- Saiki Kusuo Powers - Full Version + Auto Regen + Tombol Gambar
+-- Saiki Kusuo Powers - Full Version + Auto Regen + Tombol Gambar + Flight 2x Jump
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 -- ===== KONFIGURASI =====
-local IMAGE_URL = "https://i.imgur.com/xxxxx.png" -- Ganti dengan link gambar Saiki kamu
+local IMAGE_URL = "https://i.postimg.cc/NMpnzqwF/26ae679d70f9b866ef1995eee2f9db1b.jpg"
 local WA_LINK = "https://whatsapp.com/channel/0029VbD8SsK4SpkJ9HjqBo1x"
 
 local Settings = {
@@ -17,23 +17,25 @@ local Settings = {
     ElementPower = 50,
     AutoRegen = false,
     RegenAmount = 9,
+    FlightEnabled = false,
 }
 
 -- ===== GUI UTAMA =====
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false -- Biar gak kehapus saat respawn
 
 -- ===== TOMBOL BUKA UI (GAMBAR KOTAK) =====
 local ToggleBtn = Instance.new("ImageButton")
-ToggleBtn.Size = UDim2.new(0, 60, 0, 60) -- Kotak
+ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
 ToggleBtn.Image = IMAGE_URL
 ToggleBtn.ScaleType = Enum.ScaleType.Crop
 ToggleBtn.Parent = ScreenGui
 local TBC = Instance.new("UICorner", ToggleBtn)
-TBC.CornerRadius = UDim.new(0, 8) -- Sedikit melengkung di sudut, tapi tetap kotak
+TBC.CornerRadius = UDim.new(0, 8)
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 450, 0, 320)
@@ -213,6 +215,7 @@ local function createSlider(name, yPos, min, max, default, callback)
     table.insert(allFeatures, {name = name, button = SliderBg, label = Label})
 end
 
+-- ===== AUTO REGEN =====
 local regenConnection = nil
 local lastHealth = nil
 
@@ -233,10 +236,90 @@ local function startAutoRegen()
                 end
             end
         end
-        lastHealth = humanoid.Health
     end)
 end
 
+-- ===== FLIGHT SYSTEM (2X JUMP + WASD) =====
+local flying = false
+local bodyVel = nil
+local bodyGyro = nil
+local jumpCount = 0
+local lastJumpTime = 0
+
+local function startFlight()
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    if flying then return end
+    flying = true
+    bodyVel = Instance.new("BodyVelocity", hrp)
+    bodyVel.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVel.Velocity = Vector3.new(0, 0, 0)
+    bodyGyro = Instance.new("BodyGyro", hrp)
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bodyGyro.P = 1000
+    bodyGyro.D = 50
+    bodyGyro.CFrame = hrp.CFrame
+end
+
+local function stopFlight()
+    flying = false
+    if bodyVel then bodyVel:Destroy() bodyVel = nil end
+    if bodyGyro then bodyGyro:Destroy() bodyGyro = nil end
+end
+
+-- Update flight movement
+RunService.RenderStepped:Connect(function()
+    if flying and bodyVel and bodyGyro then
+        local moveDir = Vector3.new(0, 0, 0)
+        local cam = workspace.CurrentCamera
+        if UIS:IsKeyDown(Enum.KeyCode.W) then
+            moveDir = moveDir + cam.CFrame.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then
+            moveDir = moveDir - cam.CFrame.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then
+            moveDir = moveDir - cam.CFrame.RightVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then
+            moveDir = moveDir + cam.CFrame.RightVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.Space) then
+            moveDir = moveDir + Vector3.new(0, 1, 0)
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
+            moveDir = moveDir - Vector3.new(0, 1, 0)
+        end
+        if moveDir.Magnitude > 0 then
+            bodyVel.Velocity = moveDir.Unit * Settings.FlightSpeed
+        else
+            bodyVel.Velocity = Vector3.new(0, 0, 0)
+        end
+        bodyGyro.CFrame = cam.CFrame
+    end
+end)
+
+-- Deteksi lompat 2x
+UIS.JumpRequest:Connect(function()
+    if not Settings.FlightEnabled then return end
+    local now = tick()
+    if now - lastJumpTime < 0.4 then
+        jumpCount = jumpCount + 1
+    else
+        jumpCount = 1
+    end
+    lastJumpTime = now
+    if jumpCount >= 2 then
+        jumpCount = 0
+        if flying then
+            stopFlight()
+        else
+            startFlight()
+        end
+    end
+end)
+
+-- ===== TAB POWERS =====
 local function openPowers()
     clearContent()
     createToggle("TELEKINESIS", 5, false, function(v)
@@ -321,6 +404,7 @@ local function openPowers()
     end)
 end
 
+-- ===== TAB ELEMEN =====
 local function openElements()
     clearContent()
     local activeElement = nil
@@ -371,6 +455,7 @@ local function openElements()
     end)
 end
 
+-- ===== TAB SETTINGS =====
 local function openSettings()
     clearContent()
     createToggle("INVISIBLE", 5, false, function(v)
@@ -402,34 +487,13 @@ local function openSettings()
     end)
 end
 
+-- ===== TAB FLIGHT =====
 local function openFlight()
     clearContent()
-    local flying = false
-    local bodyVel
-    local bodyGyro
-    
-    createToggle("FLIGHT", 5, false, function(v)
-        flying = v
-        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        if flying then
-            bodyVel = Instance.new("BodyVelocity", hrp)
-            bodyVel.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-            bodyVel.Velocity = Vector3.new(0, 0, 0)
-            bodyGyro = Instance.new("BodyGyro", hrp)
-            bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-            bodyGyro.P = 1000
-            bodyGyro.D = 50
-            RunService.RenderStepped:Connect(function()
-                if flying and bodyVel and bodyGyro then
-                    local cam = workspace.CurrentCamera
-                    bodyVel.Velocity = cam.CFrame.lookVector * Settings.FlightSpeed
-                    bodyGyro.CFrame = cam.CFrame
-                end
-            end)
-        else
-            if bodyVel then bodyVel:Destroy() end
-            if bodyGyro then bodyGyro:Destroy() end
+    createToggle("FLIGHT (2x JUMP)", 5, false, function(v)
+        Settings.FlightEnabled = v
+        if not v and flying then
+            stopFlight()
         end
     end)
     createSlider("Kecepatan Terbang", 40, 10, 500, Settings.FlightSpeed, function(v)
@@ -473,10 +537,12 @@ SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
     end
 end)
 
+-- ===== TOGGLE UI (TOMBOL TETAP ADA) =====
 ToggleBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
+-- ===== TOMBOL CLOSE (HANYA SEMBUNYIKAN UI) =====
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 25, 0, 25)
 CloseBtn.Position = UDim2.new(1, -30, 0, 5)
@@ -489,5 +555,5 @@ CloseBtn.Parent = MainFrame
 local CC = Instance.new("UICorner", CloseBtn)
 CC.CornerRadius = UDim.new(0, 12)
 CloseBtn.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
+    MainFrame.Visible = false -- Cuma sembunyikan, tombol tetap ada
 end)
