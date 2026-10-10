@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers - 
+-- Saiki Kusuo Powers --- saiki script
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -23,26 +23,18 @@ ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Tombol Deluxe (gambar, sudut tumpul)
+-- Tombol Deluxe (teks, font SciFi)
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 ToggleBtn.Text = "$@¡k!"
-ToggleBtn.TextTransparency = 1
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.TextScaled = true
+ToggleBtn.Font = Enum.Font.SciFi
 ToggleBtn.Parent = ScreenGui
 local TBC = Instance.new("UICorner", ToggleBtn)
-TBC.CornerRadius = UDim.new(0, 8) -- Sudut tumpul, bukan bulat
-
-local ToggleImg = Instance.new("ImageLabel")
-ToggleImg.Size = UDim2.new(1, 0, 1, 0)
-ToggleImg.BackgroundTransparency = 1
-ToggleImg.Image = "rbxassetid://5224936802"
-ToggleImg.ScaleType = Enum.ScaleType.Stretch
-ToggleImg.ZIndex = 2
-ToggleImg.Parent = ToggleBtn
-local TIC = Instance.new("UICorner", ToggleImg)
-TIC.CornerRadius = UDim.new(0, 8)
+TBC.CornerRadius = UDim.new(0, 8)
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
@@ -80,7 +72,7 @@ SideTitle.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 SideTitle.Text = "SAIKI"
 SideTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 SideTitle.TextScaled = true
-SideTitle.Font = Enum.Font.GothamBold
+SideTitle.Font = Enum.Font.SciFi
 SideTitle.Parent = Sidebar
 local STC = Instance.new("UICorner", SideTitle)
 STC.CornerRadius = UDim.new(0, 12)
@@ -104,7 +96,7 @@ SearchBox.Text = ""
 SearchBox.TextColor3 = Color3.fromRGB(80, 80, 80)
 SearchBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
 SearchBox.TextScaled = true
-SearchBox.Font = Enum.Font.Gotham
+SearchBox.Font = Enum.Font.SciFi
 SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 SearchBox.Parent = SearchFrame
 
@@ -139,7 +131,7 @@ local function createToggle(name, yPos, default, callback)
     Btn.Text = name
     Btn.TextColor3 = Color3.fromRGB(80, 80, 80)
     Btn.TextScaled = true
-    Btn.Font = Enum.Font.Gotham
+    Btn.Font = Enum.Font.SciFi
     Btn.Parent = ScrollingFrame
     local c = Instance.new("UICorner", Btn)
     c.CornerRadius = UDim.new(0, 6)
@@ -162,7 +154,7 @@ local function createSlider(name, yPos, min, max, default, callback)
     Label.Text = name .. ": " .. default
     Label.TextColor3 = Color3.fromRGB(80, 80, 80)
     Label.TextScaled = true
-    Label.Font = Enum.Font.Gotham
+    Label.Font = Enum.Font.SciFi
     Label.TextXAlignment = Enum.TextXAlignment.Left
     Label.Parent = ScrollingFrame
 
@@ -300,7 +292,6 @@ local apiAuraActive = false
 local apiRadiusActive = false
 local apiTrailActive = false
 local apiAuraAttachment = nil
-local apiTrailParts = {}
 
 local function toggleApiAura(v)
     apiAuraActive = v
@@ -374,25 +365,15 @@ local function toggleApiTrail(v)
                         trailPart.Material = Enum.Material.Neon
                         trailPart.Color = Color3.fromRGB(255, 69, 0)
                         trailPart.Parent = workspace
-                        
                         local fire = Instance.new("Fire")
                         fire.Size = Settings.FireSize
                         fire.Parent = trailPart
-                        
-                        table.insert(apiTrailParts, trailPart)
-                        
-                        task.delay(5, function()
-                            if trailPart then trailPart:Destroy() end
-                        end)
-                        
-                        -- Cek sentuhan
-                        local touchConn = trailPart.Touched:Connect(function(hit)
+                        task.delay(5, function() if trailPart then trailPart:Destroy() end end)
+                        trailPart.Touched:Connect(function(hit)
                             local hitChar = hit.Parent
                             if hitChar and hitChar ~= char then
                                 local hitHumanoid = hitChar:FindFirstChild("Humanoid")
-                                if hitHumanoid then
-                                    hitHumanoid.Health = 0
-                                end
+                                if hitHumanoid then hitHumanoid.Health = 0 end
                             end
                         end)
                     end
@@ -507,7 +488,6 @@ local function openPowers()
             if regenConnection then regenConnection:Disconnect() regenConnection = nil end
         end
     end)
-    -- ELEMEN
     createToggle("API (AURA)", 320, false, function(v) toggleApiAura(v) end)
     createToggle("API (RADIUS 30)", 355, false, function(v) toggleApiRadius(v) end)
     createToggle("API (JEJAK)", 390, false, function(v) toggleApiTrail(v) end)
@@ -515,4 +495,15 @@ end
 
 local function openSettings()
     clearContent()
-    createSlider("Kecepatan Terbang", 5, 10, 500, Settings.FlightSpeed, fun
+    createSlider("Kecepatan Terbang", 5, 10, 500, Settings.FlightSpeed, function(v) Settings.FlightSpeed = v end)
+    createSlider("Kekuatan Tonjokan", 40, 100, 2000, Settings.PunchPower, function(v) Settings.PunchPower = v end)
+    createSlider("Ukuran Api", 75, 1, 50, Settings.FireSize, function(v) Settings.FireSize = v end)
+    createSlider("Opasitas Invisible (%)", 110, 0, 100, Settings.InvisibilityOpacity, function(v) Settings.InvisibilityOpacity = v end)
+    createSlider("Jumlah Regen (HP)", 145, 1, 50, Settings.RegenAmount, function(v) Settings.RegenAmount = v end)
+end
+
+local function openSC()
+    clearContent()
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.95, 0, 0, 100)
+    label.Position = UDim2.new(0.025, 
