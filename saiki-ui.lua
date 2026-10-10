@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers - Revisi Deluxe Gambar
+-- Saiki Kusuo Powers - Revisi Besar
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -13,6 +13,8 @@ local Settings = {
     AutoRegen = false,
     RegenAmount = 9,
     FlightEnabled = false,
+    PunchPower = 500,
+    FireSize = 10,
 }
 
 -- GUI
@@ -21,16 +23,16 @@ ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Tombol Deluxe (gambar)
+-- Tombol Deluxe (gambar, sudut tumpul)
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 ToggleBtn.Text = "$@¡k!"
 ToggleBtn.TextTransparency = 1
 ToggleBtn.Parent = ScreenGui
 local TBC = Instance.new("UICorner", ToggleBtn)
-TBC.CornerRadius = UDim.new(0, 30)
+TBC.CornerRadius = UDim.new(0, 8) -- Sudut tumpul, bukan bulat
 
 local ToggleImg = Instance.new("ImageLabel")
 ToggleImg.Size = UDim2.new(1, 0, 1, 0)
@@ -39,22 +41,34 @@ ToggleImg.Image = "rbxassetid://5224936802"
 ToggleImg.ScaleType = Enum.ScaleType.Stretch
 ToggleImg.ZIndex = 2
 ToggleImg.Parent = ToggleBtn
+local TIC = Instance.new("UICorner", ToggleImg)
+TIC.CornerRadius = UDim.new(0, 8)
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 450, 0, 350)
 MainFrame.Position = UDim2.new(0.5, -225, 0.5, -175)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 10, 25)
+MainFrame.BackgroundColor3 = Color3.fromRGB(255, 240, 245)
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
 local MC = Instance.new("UICorner", MainFrame)
 MC.CornerRadius = UDim.new(0, 12)
 
+-- Gradient warna pastel
+local Gradient = Instance.new("UIGradient")
+Gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 182, 193)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(173, 216, 230)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(144, 238, 144))
+}
+Gradient.Rotation = 45
+Gradient.Parent = MainFrame
+
 -- Sidebar
 local Sidebar = Instance.new("Frame")
 Sidebar.Size = UDim2.new(0, 100, 1, 0)
-Sidebar.BackgroundColor3 = Color3.fromRGB(50, 15, 40)
+Sidebar.BackgroundColor3 = Color3.fromRGB(255, 218, 224)
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = MainFrame
 local SC = Instance.new("UICorner", Sidebar)
@@ -62,7 +76,7 @@ SC.CornerRadius = UDim.new(0, 12)
 
 local SideTitle = Instance.new("TextLabel")
 SideTitle.Size = UDim2.new(1, 0, 0, 40)
-SideTitle.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+SideTitle.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 SideTitle.Text = "SAIKI"
 SideTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 SideTitle.TextScaled = true
@@ -75,7 +89,7 @@ STC.CornerRadius = UDim.new(0, 12)
 local SearchFrame = Instance.new("Frame")
 SearchFrame.Size = UDim2.new(1, -110, 0, 30)
 SearchFrame.Position = UDim2.new(0, 105, 0, 5)
-SearchFrame.BackgroundColor3 = Color3.fromRGB(60, 20, 50)
+SearchFrame.BackgroundColor3 = Color3.fromRGB(230, 245, 255)
 SearchFrame.BorderSizePixel = 0
 SearchFrame.Parent = MainFrame
 local SFC = Instance.new("UICorner", SearchFrame)
@@ -87,8 +101,8 @@ SearchBox.Position = UDim2.new(0, 10, 0, 0)
 SearchBox.BackgroundTransparency = 1
 SearchBox.PlaceholderText = "Cari fitur..."
 SearchBox.Text = ""
-SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-SearchBox.PlaceholderColor3 = Color3.fromRGB(200, 150, 180)
+SearchBox.TextColor3 = Color3.fromRGB(80, 80, 80)
+SearchBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
 SearchBox.TextScaled = true
 SearchBox.Font = Enum.Font.Gotham
 SearchBox.TextXAlignment = Enum.TextXAlignment.Left
@@ -121,9 +135,9 @@ local function createToggle(name, yPos, default, callback)
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(0.95, 0, 0, 28)
     Btn.Position = UDim2.new(0.025, 0, 0, yPos)
-    Btn.BackgroundColor3 = Color3.fromRGB(80, 20, 60)
+    Btn.BackgroundColor3 = Color3.fromRGB(230, 245, 255)
     Btn.Text = name
-    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Btn.TextColor3 = Color3.fromRGB(80, 80, 80)
     Btn.TextScaled = true
     Btn.Font = Enum.Font.Gotham
     Btn.Parent = ScrollingFrame
@@ -132,11 +146,75 @@ local function createToggle(name, yPos, default, callback)
     local state = default
     Btn.MouseButton1Click:Connect(function()
         state = not state
-        Btn.BackgroundColor3 = state and Color3.fromRGB(255, 105, 180) or Color3.fromRGB(80, 20, 60)
+        Btn.BackgroundColor3 = state and Color3.fromRGB(255, 182, 193) or Color3.fromRGB(230, 245, 255)
+        Btn.TextColor3 = state and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(80, 80, 80)
         callback(state)
     end)
-    if default then Btn.BackgroundColor3 = Color3.fromRGB(255, 105, 180) end
+    if default then Btn.BackgroundColor3 = Color3.fromRGB(255, 182, 193) Btn.TextColor3 = Color3.fromRGB(255, 255, 255) end
     table.insert(allFeatures, {name = name, button = Btn})
+end
+
+local function createSlider(name, yPos, min, max, default, callback)
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0.95, 0, 0, 20)
+    Label.Position = UDim2.new(0.025, 0, 0, yPos)
+    Label.BackgroundTransparency = 1
+    Label.Text = name .. ": " .. default
+    Label.TextColor3 = Color3.fromRGB(80, 80, 80)
+    Label.TextScaled = true
+    Label.Font = Enum.Font.Gotham
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = ScrollingFrame
+
+    local SliderBg = Instance.new("Frame")
+    SliderBg.Size = UDim2.new(0.9, 0, 0, 8)
+    SliderBg.Position = UDim2.new(0.05, 0, 0, yPos + 22)
+    SliderBg.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+    SliderBg.BorderSizePixel = 0
+    SliderBg.Parent = ScrollingFrame
+    local SBC = Instance.new("UICorner", SliderBg)
+    SBC.CornerRadius = UDim.new(1, 0)
+
+    local Fill = Instance.new("Frame")
+    Fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
+    Fill.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
+    Fill.BorderSizePixel = 0
+    Fill.Parent = SliderBg
+    local FillC = Instance.new("UICorner", Fill)
+    FillC.CornerRadius = UDim.new(1, 0)
+
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(0, 16, 0, 16)
+    Btn.Position = UDim2.new((default - min) / (max - min), -8, 0.5, -8)
+    Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Btn.Text = ""
+    Btn.Parent = SliderBg
+    local BC = Instance.new("UICorner", Btn)
+    BC.CornerRadius = UDim.new(1, 0)
+
+    local dragging = false
+
+    Btn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+        end
+    end)
+    Btn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local pos = math.clamp((input.Position.X - SliderBg.AbsolutePosition.X) / SliderBg.AbsoluteSize.X, 0, 1)
+            Fill.Size = UDim2.new(pos, 0, 1, 0)
+            Btn.Position = UDim2.new(pos, -8, 0.5, -8)
+            local val = math.floor(min + (max - min) * pos)
+            Label.Text = name .. ": " .. val
+            callback(val)
+        end
+    end)
+    table.insert(allFeatures, {name = name, button = SliderBg, label = Label})
 end
 
 -- Auto Regen
@@ -217,6 +295,140 @@ UIS.JumpRequest:Connect(function()
     end
 end)
 
+-- ELEMEN API
+local apiAuraActive = false
+local apiRadiusActive = false
+local apiTrailActive = false
+local apiAuraAttachment = nil
+local apiTrailParts = {}
+
+local function toggleApiAura(v)
+    apiAuraActive = v
+    local char = player.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    if v then
+        apiAuraAttachment = Instance.new("Attachment", hrp)
+        local particle = Instance.new("ParticleEmitter", apiAuraAttachment)
+        particle.Texture = "rbxassetid://243098098"
+        particle.Color = ColorSequence.new(Color3.fromRGB(255, 69, 0))
+        particle.Size = NumberSequence.new(Settings.FireSize)
+        particle.Transparency = NumberSequence.new(0.3)
+        particle.Lifetime = NumberRange.new(0.5, 1)
+        particle.Rate = 100
+        particle.Speed = NumberRange.new(5, 10)
+        particle.SpreadAngle = Vector2.new(180, 180)
+    else
+        if apiAuraAttachment then apiAuraAttachment:Destroy() apiAuraAttachment = nil end
+    end
+end
+
+local function toggleApiRadius(v)
+    apiRadiusActive = v
+    if v then
+        task.spawn(function()
+            while apiRadiusActive do
+                local char = player.Character
+                if char then
+                    local hrp = char:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        for _, plr in pairs(game.Players:GetPlayers()) do
+                            if plr ~= player and plr.Character then
+                                local targetHrp = plr.Character:FindFirstChild("HumanoidRootPart")
+                                local targetHumanoid = plr.Character:FindFirstChild("Humanoid")
+                                if targetHrp and targetHumanoid then
+                                    local dist = (targetHrp.Position - hrp.Position).Magnitude
+                                    if dist <= 30 then
+                                        targetHumanoid.Health = 0
+                                        local fire = Instance.new("Fire")
+                                        fire.Size = Settings.FireSize
+                                        fire.Parent = targetHrp
+                                        game:GetService("Debris"):AddItem(fire, 2)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                task.wait(0.5)
+            end
+        end)
+    end
+end
+
+local function toggleApiTrail(v)
+    apiTrailActive = v
+    if v then
+        task.spawn(function()
+            while apiTrailActive do
+                local char = player.Character
+                if char then
+                    local hrp = char:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local trailPart = Instance.new("Part")
+                        trailPart.Size = Vector3.new(3, 0.2, 3)
+                        trailPart.Position = hrp.Position - Vector3.new(0, 2.5, 0)
+                        trailPart.Anchored = true
+                        trailPart.CanCollide = false
+                        trailPart.Material = Enum.Material.Neon
+                        trailPart.Color = Color3.fromRGB(255, 69, 0)
+                        trailPart.Parent = workspace
+                        
+                        local fire = Instance.new("Fire")
+                        fire.Size = Settings.FireSize
+                        fire.Parent = trailPart
+                        
+                        table.insert(apiTrailParts, trailPart)
+                        
+                        task.delay(5, function()
+                            if trailPart then trailPart:Destroy() end
+                        end)
+                        
+                        -- Cek sentuhan
+                        local touchConn = trailPart.Touched:Connect(function(hit)
+                            local hitChar = hit.Parent
+                            if hitChar and hitChar ~= char then
+                                local hitHumanoid = hitChar:FindFirstChild("Humanoid")
+                                if hitHumanoid then
+                                    hitHumanoid.Health = 0
+                                end
+                            end
+                        end)
+                    end
+                end
+                task.wait(0.3)
+            end
+        end)
+    end
+end
+
+-- BOUNDLESS
+local function activateBoundless()
+    local char = player.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {char}
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    local result = workspace:Raycast(hrp.Position, hrp.CFrame.LookVector * 10, rayParams)
+    if result and result.Instance then
+        local targetChar = result.Instance.Parent
+        if targetChar then
+            local targetHumanoid = targetChar:FindFirstChild("Humanoid")
+            local targetHrp = targetChar:FindFirstChild("HumanoidRootPart")
+            if targetHumanoid and targetHrp then
+                local bv = Instance.new("BodyVelocity", targetHrp)
+                bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bv.Velocity = hrp.CFrame.LookVector * Settings.PunchPower + Vector3.new(0, 200, 0)
+                game:GetService("Debris"):AddItem(bv, 0.5)
+                targetHumanoid.Health = 0
+            end
+        end
+    end
+end
+
 local function openPowers()
     clearContent()
     createToggle("TELEKINESIS", 5, false, function(v)
@@ -228,15 +440,7 @@ local function openPowers()
             if hrp then hrp.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0)) end
         end
     end)
-    createToggle("PYROKINESIS", 75, false, function(v)
-        if v and mouse.Target and mouse.Target:IsA("BasePart") then
-            local fire = Instance.new("Fire")
-            fire.Size = 10
-            fire.Parent = mouse.Target
-            mouse.Target:BreakJoints()
-        end
-    end)
-    createToggle("TIME STOP", 110, false, function(v)
+    createToggle("TIME STOP", 75, false, function(v)
         for _, plr in pairs(game.Players:GetPlayers()) do
             if plr ~= player and plr.Character then
                 local h = plr.Character:FindFirstChild("Humanoid")
@@ -244,7 +448,7 @@ local function openPowers()
             end
         end
     end)
-    createToggle("MIND READ", 145, false, function(v)
+    createToggle("MIND READ", 110, false, function(v)
         if v then
             for _, plr in pairs(game.Players:GetPlayers()) do
                 if plr ~= player and plr.Character then
@@ -267,12 +471,12 @@ local function openPowers()
             end
         end
     end)
-    createToggle("X-RAY", 180, false, function(v)
+    createToggle("X-RAY", 145, false, function(v)
         for _, obj in pairs(workspace:GetDescendants()) do
             if obj:IsA("BasePart") and obj.Name ~= "HumanoidRootPart" then obj.LocalTransparencyModifier = v and 0.7 or 0 end
         end
     end)
-    createToggle("BOUNDLESS", 215, false, function(v)
+    createToggle("BOUNDLESS", 180, false, function(v)
         if v then
             local char = player.Character
             if char then
@@ -280,78 +484,15 @@ local function openPowers()
                 tool.Name = "Boundless"
                 tool.RequiresHandle = false
                 tool.Parent = player.Backpack
-                tool.Activated:Connect(function()
-                    local hrp = char:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        local rayParams = RaycastParams.new()
-                        rayParams.FilterDescendantsInstances = {char}
-                        rayParams.FilterType = Enum.RaycastFilterType.Exclude
-                        local result = workspace:Raycast(hrp.Position, hrp.CFrame.LookVector * 10, rayParams)
-                        if result and result.Instance then
-                            local targetChar = result.Instance.Parent
-                            if targetChar then
-                                local targetHumanoid = targetChar:FindFirstChild("Humanoid")
-                                local targetHrp = targetChar:FindFirstChild("HumanoidRootPart")
-                                if targetHumanoid and targetHrp then
-                                    local bv = Instance.new("BodyVelocity", targetHrp)
-                                    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                                    bv.Velocity = hrp.CFrame.LookVector * 500 + Vector3.new(0, 200, 0)
-                                    game:GetService("Debris"):AddItem(bv, 0.5)
-                                    targetHumanoid.Health = 0
-                                end
-                            end
-                        end
-                    end
-                end)
+                tool.Activated:Connect(function() activateBoundless() end)
             end
         end
     end)
-    createToggle("FLIGHT (2x JUMP)", 250, false, function(v)
+    createToggle("FLIGHT (2x JUMP)", 215, false, function(v)
         Settings.FlightEnabled = v
         if not v and flying then stopFlight() end
     end)
-    -- Elemen
-    local elements = {"API", "AIR", "ANGIN", "TANAH", "LISTRIK", "BESI"}
-    local elementColors = {
-        Color3.fromRGB(255, 69, 0),
-        Color3.fromRGB(0, 150, 255),
-        Color3.fromRGB(200, 255, 200),
-        Color3.fromRGB(139, 69, 19),
-        Color3.fromRGB(255, 255, 0),
-        Color3.fromRGB(150, 150, 150),
-    }
-    local activeElement = nil
-    for i, name in ipairs(elements) do
-        createToggle(name, 285 + (i-1) * 35, false, function(v)
-            if v then
-                if activeElement then activeElement:Destroy() end
-                local char = player.Character
-                if char then
-                    local hrp = char:FindFirstChild("HumanoidRootPart")
-                    if hrp then
-                        local attachment = Instance.new("Attachment", hrp)
-                        local particle = Instance.new("ParticleEmitter", attachment)
-                        particle.Texture = "rbxassetid://243098098"
-                        particle.Color = ColorSequence.new(elementColors[i])
-                        particle.Size = NumberSequence.new(2)
-                        particle.Transparency = NumberSequence.new(0.3)
-                        particle.Lifetime = NumberRange.new(1, 2)
-                        particle.Rate = 50
-                        particle.Speed = NumberRange.new(5, 10)
-                        particle.SpreadAngle = Vector2.new(180, 180)
-                        activeElement = attachment
-                    end
-                end
-            else
-                if activeElement then activeElement:Destroy() activeElement = nil end
-            end
-        end)
-    end
-end
-
-local function openSettings()
-    clearContent()
-    createToggle("INVISIBLE", 5, false, function(v)
+    createToggle("INVISIBLE", 250, false, function(v)
         local char = player.Character
         if char then
             for _, part in pairs(char:GetDescendants()) do
@@ -359,71 +500,19 @@ local function openSettings()
             end
         end
     end)
-    createToggle("AUTO REGEN", 40, false, function(v)
+    createToggle("AUTO REGEN", 285, false, function(v)
         Settings.AutoRegen = v
         if v then startAutoRegen()
         else
             if regenConnection then regenConnection:Disconnect() regenConnection = nil end
         end
     end)
+    -- ELEMEN
+    createToggle("API (AURA)", 320, false, function(v) toggleApiAura(v) end)
+    createToggle("API (RADIUS 30)", 355, false, function(v) toggleApiRadius(v) end)
+    createToggle("API (JEJAK)", 390, false, function(v) toggleApiTrail(v) end)
 end
 
-local function openSC()
+local function openSettings()
     clearContent()
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0.95, 0, 0, 100)
-    label.Position = UDim2.new(0.025, 0, 0, 20)
-    label.BackgroundTransparency = 1
-    label.Text = "follow for more script\n" .. WA_LINK
-    label.TextColor3 = Color3.fromRGB(255, 182, 193)
-    label.TextScaled = true
-    label.Font = Enum.Font.Gotham
-    label.TextWrapped = true
-    label.Parent = ScrollingFrame
-end
-
-local function createSideButton(name, yPos, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -10, 0, 35)
-    btn.Position = UDim2.new(0, 5, 0, yPos)
-    btn.BackgroundColor3 = Color3.fromRGB(80, 20, 60)
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextScaled = true
-    btn.Font = Enum.Font.Gotham
-    btn.Parent = Sidebar
-    local c = Instance.new("UICorner", btn)
-    c.CornerRadius = UDim.new(0, 8)
-    btn.MouseButton1Click:Connect(callback)
-end
-
-createSideButton("Powers", 50, openPowers)
-createSideButton("Pengaturan", 90, openSettings)
-createSideButton("SC", 130, openSC)
-
-openPowers()
-
-ToggleBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
-end)
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Position = UDim2.new(1, -30, 0, 5)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextScaled = true
-CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.Parent = MainFrame
-local CC = Instance.new("UICorner", CloseBtn)
-CC.CornerRadius = UDim.new(0, 12)
-CloseBtn.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-end)
-
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Saiki Powers";
-    Text = "Script loaded!";
-    Duration = 3;
-})
+    createSlider("Kecepatan Terbang", 5, 10, 500, Settings.FlightSpeed, fun
