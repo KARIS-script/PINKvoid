@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers - Draggable Deluxe
+-- Saiki Kusuo Powers - Final
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -23,7 +23,6 @@ ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Deluxe (DRAGGABLE)
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
@@ -33,7 +32,6 @@ ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.TextScaled = true
 ToggleBtn.Parent = ScreenGui
 
--- DRAG SYSTEM
 local dragging = false
 local dragInput = nil
 local dragStart = nil
@@ -43,7 +41,6 @@ local function updateDrag(input)
     local delta = input.Position - dragStart
     local newX = startPos.X.Offset + delta.X
     local newY = startPos.Y.Offset + delta.Y
-    -- Batasin biar gak keluar layar
     local screenW = ScreenGui.AbsoluteSize.X
     local screenH = ScreenGui.AbsoluteSize.Y
     newX = math.clamp(newX, 0, screenW - ToggleBtn.AbsoluteSize.X)
@@ -76,7 +73,6 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- Main Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 450, 0, 350)
 MainFrame.Position = UDim2.new(0.5, -225, 0.5, -175)
@@ -100,7 +96,6 @@ Sidebar.BackgroundColor3 = Color3.fromRGB(255, 218, 224)
 Sidebar.BorderSizePixel = 0
 Sidebar.Parent = MainFrame
 
--- Tombol Exit
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 25, 0, 25)
 CloseBtn.Position = UDim2.new(1, -30, 0, 5)
@@ -113,7 +108,6 @@ CloseBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = false
 end)
 
--- Tombol Ukuran UI
 local SizeBtn = Instance.new("TextButton")
 SizeBtn.Size = UDim2.new(0, 25, 0, 25)
 SizeBtn.Position = UDim2.new(1, -60, 0, 5)
@@ -134,7 +128,6 @@ SizeBtn.MouseButton1Click:Connect(function()
     MainFrame.Position = UDim2.new(0.5, -225 * scale, 0.5, -175 * scale)
 end)
 
--- Search Bar
 local SearchFrame = Instance.new("Frame")
 SearchFrame.Size = UDim2.new(1, -115, 0, 30)
 SearchFrame.Position = UDim2.new(0, 108, 0, 35)
@@ -153,7 +146,6 @@ SearchBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
 SearchBox.TextScaled = true
 SearchBox.Parent = SearchFrame
 
--- Content
 local ContentFrame = Instance.new("ScrollingFrame")
 ContentFrame.Size = UDim2.new(1, -115, 1, -75)
 ContentFrame.Position = UDim2.new(0, 108, 0, 70)
@@ -244,7 +236,6 @@ local function createSlider(name, yPos, min, max, default, callback)
     table.insert(allFeatures, {name = name, button = SliderBg, label = Label})
 end
 
--- TELEPORT
 mouse.Button1Down:Connect(function()
     if Settings.TeleportEnabled then
         local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -254,7 +245,6 @@ mouse.Button1Down:Connect(function()
     end
 end)
 
--- AUTO REGEN
 local regenConnection = nil
 local lastHealth = nil
 
@@ -278,7 +268,6 @@ local function startAutoRegen()
     end)
 end
 
--- FLIGHT
 local flying = false
 local bodyVel = nil
 local bodyGyro = nil
@@ -355,7 +344,6 @@ UIS.JumpRequest:Connect(function()
     end
 end)
 
--- API
 local function toggleApiAura(v)
     if v then
         local char = player.Character
@@ -526,4 +514,7 @@ local function openPowers()
                         bb.Adornee = hrp
                         bb.Parent = hrp
                         local lbl = Instance.new("TextLabel")
-                 
+                        lbl.Size = UDim2.new(1, 0, 1, 0)
+                        lbl.BackgroundTransparency = 1
+                        lbl.Text = plr.Name
+                        lbl.TextColor3 = Color3.fromRGB(255, 10
