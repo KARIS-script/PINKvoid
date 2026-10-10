@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers --- saiki script
+-- Saiki Kusuo Powers
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -23,15 +23,15 @@ ScreenGui.Name = "SaikiPowers"
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Tombol Deluxe (teks, font SciFi)
+-- Tombol Deluxe
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 10, 0.5, -30)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
-ToggleBtn.Text = "$@¡k!"
+ToggleBtn.Text = "$&K"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.TextScaled = true
-ToggleBtn.Font = Enum.Font.SciFi
+ToggleBtn.Font = Enum.Font.GothamBold
 ToggleBtn.Parent = ScreenGui
 local TBC = Instance.new("UICorner", ToggleBtn)
 TBC.CornerRadius = UDim.new(0, 8)
@@ -72,7 +72,7 @@ SideTitle.BackgroundColor3 = Color3.fromRGB(255, 182, 193)
 SideTitle.Text = "SAIKI"
 SideTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 SideTitle.TextScaled = true
-SideTitle.Font = Enum.Font.SciFi
+SideTitle.Font = Enum.Font.GothamBold
 SideTitle.Parent = Sidebar
 local STC = Instance.new("UICorner", SideTitle)
 STC.CornerRadius = UDim.new(0, 12)
@@ -96,7 +96,7 @@ SearchBox.Text = ""
 SearchBox.TextColor3 = Color3.fromRGB(80, 80, 80)
 SearchBox.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
 SearchBox.TextScaled = true
-SearchBox.Font = Enum.Font.SciFi
+SearchBox.Font = Enum.Font.Gotham
 SearchBox.TextXAlignment = Enum.TextXAlignment.Left
 SearchBox.Parent = SearchFrame
 
@@ -131,7 +131,7 @@ local function createToggle(name, yPos, default, callback)
     Btn.Text = name
     Btn.TextColor3 = Color3.fromRGB(80, 80, 80)
     Btn.TextScaled = true
-    Btn.Font = Enum.Font.SciFi
+    Btn.Font = Enum.Font.Gotham
     Btn.Parent = ScrollingFrame
     local c = Instance.new("UICorner", Btn)
     c.CornerRadius = UDim.new(0, 6)
@@ -154,7 +154,7 @@ local function createSlider(name, yPos, min, max, default, callback)
     Label.Text = name .. ": " .. default
     Label.TextColor3 = Color3.fromRGB(80, 80, 80)
     Label.TextScaled = true
-    Label.Font = Enum.Font.SciFi
+    Label.Font = Enum.Font.Gotham
     Label.TextXAlignment = Enum.TextXAlignment.Left
     Label.Parent = ScrollingFrame
 
@@ -506,4 +506,5 @@ local function openSC()
     clearContent()
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(0.95, 0, 0, 100)
-    label.Position = UDim2.new(0.025, 
+    label.Position = UDim2.new(0.025, 0, 0, 20)
+    label.Backgr
