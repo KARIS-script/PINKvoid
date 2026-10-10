@@ -1,4 +1,4 @@
--- Saiki Powers - Full Version
+-- Saiki Kusuo Powers - Final Version
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
@@ -376,13 +376,6 @@ local function openPowers()
         if v and mouse.Target and mouse.Target:IsA("BasePart") then mouse.Target.Anchored = not mouse.Target.Anchored end
     end)
     createToggle("TELEPORT (Klik)", 40, function(v) end)
-    UIS.InputBegan:Connect(function(input, gp)
-        if gp then return end
-        if input.UserInputType == Enum.UserInputType.MouseButton1 and mouse.Hit then
-            local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then hrp.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0)) end
-        end
-    end)
     createToggle("TIME STOP", 75, function(v)
         for _, plr in pairs(game.Players:GetPlayers()) do
             if plr ~= player and plr.Character then
@@ -450,7 +443,6 @@ local function openPowers()
             if regenConnection then regenConnection:Disconnect() regenConnection = nil end
         end
     end)
-    -- API di Powers
     createToggle("API (AURA)", 320, function(v) toggleApiAura(v) end)
     createToggle("API (RADIUS 30)", 355, function(v) toggleApiRadius(v) end)
     createToggle("API (JEJAK)", 390, function(v) toggleApiTrail(v) end)
@@ -518,4 +510,16 @@ SizeBtn.MouseButton1Click:Connect(function()
     if sizeIndex > #sizeLevels then sizeIndex = 1 end
     local scale = sizeLevels[sizeIndex]
     MainFrame.Size = UDim2.new(0, 450 * scale, 0, 350 * scale)
-    MainFrame.Position = UDim2.new(0.5, -225 * scale, 0.
+    MainFrame.Position = UDim2.new(0.5, -225 * scale, 0.5, -175 * scale)
+end)
+
+-- TOMBOL CLOSE
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -30, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextScaled = true
+CloseBtn.Parent = MainFrame
+local CC = Instance.new("UICorner", C
