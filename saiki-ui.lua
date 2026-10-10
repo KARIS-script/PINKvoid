@@ -1,4 +1,4 @@
--- Saiki Kusuo Powers - Revisi Besar
+-- Saiki Kusuo Powers - 
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local UIS = game:GetService("UserInputService")
